@@ -1,16 +1,44 @@
 # mcp-apps-web-host
 
-A dependency-free host bridge for [MCP Apps](https://modelcontextprotocol.io/)
-(extension `2026-01-26`) in a web page: it loads a tool's `ui://` view through a
-sandbox proxy on a **second origin**, runs the handshake, forwards the tool input
-and result, relays host context changes, clamps size changes, routes `ui/message`
-to your handler and tears the view down cleanly. One ES module for the page
-(`src/host.js`, 124 lines) and one static page for the sandbox origin
-(`sandbox/sandbox.html`, 91 lines). No build step, no dependencies.
+A dependency-free host bridge for [MCP Apps](https://github.com/modelcontextprotocol/ext-apps)
+(extension `2026-01-26`, [specification](https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx))
+in a web page: it loads a tool's `ui://` view through a sandbox proxy on a
+**second origin**, runs the handshake, forwards the tool input and result, relays
+host context changes, clamps size changes, routes `ui/message` to your handler and
+tears the view down cleanly. One ES module for the page (`src/host.js`, about 130
+lines) and one static page for the sandbox origin (`sandbox/sandbox.html`, about
+90 lines). No build step, no dependencies.
 
 It was extracted from [LogiOps AI](https://github.com/aalvaropc/logiops-ai), where
 it renders an interactive plan-comparison card inside a simulated Alexa+ device;
 the two files there are byte-identical to these.
+
+## Install
+
+```sh
+npm install mcp-apps-web-host
+```
+
+```js
+import { createMcpAppHost } from "mcp-apps-web-host";
+```
+
+The sandbox page ships in the package as `mcp-apps-web-host/sandbox.html`
+(`node_modules/mcp-apps-web-host/sandbox/sandbox.html`); serve it as a static file
+from the sandbox origin. Without npm, copy `src/host.js` and `sandbox/sandbox.html`:
+there is nothing to build.
+
+## Try it
+
+```sh
+npm run example
+```
+
+opens a page on `http://127.0.0.1:8000` and the sandbox on `http://127.0.0.1:8001`
+(two origins), with a stand-in MCP server that has one tool and one `ui://` view.
+Call the tool, switch the theme, pick an option inside the view (the page accepts
+two of the three) and hide the view; the page logs what it saw. Set `PAGE_PORT`
+and `SANDBOX_PORT` to use other ports.
 
 ## Why a second origin
 
@@ -39,11 +67,19 @@ served with data; the page's own origin must answer 404 for it). Locally,
 `127.0.0.1` and `localhost` are two origins on the same server, so each can
 sandbox the other; in production use a second hostname (LogiOps uses a second
 CloudFront distribution). Serve it with
-`Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors <page origin>`
+`Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors <page origin>`
 and `Referrer-Policy: no-referrer`.
 
+The view is loaded with `srcdoc`, so it inherits this header's policy on top of
+the one the proxy builds from its `_meta.ui.csp`: **the header caps what any view
+can ask for.** With the policy above, a view can inline scripts, styles, images and
+fonts, and cannot load or fetch anything. To let views reach
+`https://api.example.com`, add it to `connect-src` in the header as well; add
+resource domains to `script-src`, `style-src`, `img-src`, `font-src` and
+`media-src`, and frame domains to `frame-src`.
+
 ```js
-import { createMcpAppHost } from "./host.js";
+import { createMcpAppHost } from "mcp-apps-web-host";
 
 const host = createMcpAppHost({
   sandboxOrigin: "https://sandbox.example.com",   // null disables views entirely
@@ -54,7 +90,7 @@ const host = createMcpAppHost({
   uriPrefix: "ui://my-server/",                    // only views under this prefix are loaded
   hostInfo: { name: "My host", version: "1.0.0" },
   hostContext: () => ({ theme: "dark", displayMode: "inline", containerDimensions: { width: 600, maxHeight: 640 } }),
-  onMessage: (params) => handleViewMessage(params), // true = accepted, false = -32000 with rejectMessage
+  onMessage: async (params) => handleViewMessage(params), // true = accepted; false, a throw or a rejection = -32000 with rejectMessage
   onHide: (reason) => { /* the frame is gone */ },
   rejectMessage: "Unknown or unavailable plan",
   frameTitle: "Resolution options (MCP App)",
@@ -79,6 +115,15 @@ resource once (cached per tool) and accepts it only when its MIME type is
 `text/html;profile=mcp-app`. A show that is superseded by another show, or whose
 `stillWanted()` turns false, shows nothing.
 
+Other options: `window` (defaults to the global `window`; pass another one to
+host in a different frame or to test with a fake), `proxyPath` (default
+`/mcp-app/sandbox.html`), `mime`, `protocol` (the version answered to
+`ui/initialize`), `frameId`, `minHeight`, `maxHeight` and `teardownTimeout`.
+
+The host object also has `loadResource(toolName)`, which reads and caches a
+tool's view without showing it (useful to prefetch), `isShowing()`, and `ready()`,
+which is true once the view has sent `ui/notifications/initialized`.
+
 ## Security model
 
 **Page side (`src/host.js`):**
@@ -93,7 +138,8 @@ resource once (cached per tool) and accepts it only when its MIME type is
   host capabilities, your host context), `tool-input`, `tool-result` and
   `host-context-changed`. Unknown requests get `-32601`.
 - `ui/message` is the only way a view influences the page, through your handler,
-  which decides and answers `{}` or `-32000`.
+  which decides and answers `{}` or `-32000`, at once or when its promise settles.
+  An answer meant for a view that has since been replaced or hidden is dropped.
 - Size changes are clamped to `[minHeight, maxHeight]`.
 - A generation counter makes stale `show`s harmless; teardown sends
   `ui/resource-teardown` and removes the frame on the reply or after
@@ -120,19 +166,33 @@ resource once (cached per tool) and accepts it only when its MIME type is
 
 ## Tests
 
-`npm test` runs the `node:test` suite against a fake window: the resource is read
-once and the frame is built right; non-MCP-App resources and stale shows are not
-shown; the handshake; other origins and windows are ignored and unknown methods get
-`-32601`; size clamping and `ui/message` routing; host context only after
-`initialized`; teardown with reply, without a view, and on timeout; a view that
-navigates away. A cross-origin browser test (`127.0.0.1` page, `localhost` proxy)
-runs in LogiOps AI's Playwright suite.
+`npm test` runs two `node:test` suites, with no browser and no dependencies.
+
+- `test/host.test.mjs`, against a fake window:
+  - the resource is read once and the frame is built right; non-MCP-App resources
+    and stale shows are not shown;
+  - the handshake; other origins and windows are ignored, and unknown methods get
+    `-32601`;
+  - size clamping; `ui/message` answered at once or later, refused when the
+    handler fails, dropped for a replaced view;
+  - host context only after `initialized`;
+  - teardown with a reply, without a view and on timeout; a view that navigates
+    away.
+- `test/sandbox.test.mjs` runs `sandbox.html`'s script in `node:vm`:
+  - the proxy stays silent unless it is framed by the host it was given;
+  - the sandbox token allowlist and the view's CSP built from its `https` origins;
+  - messages cross only between the host and the current view, and
+    `ui/notifications/sandbox-*` never crosses;
+  - a view that navigates away is removed and reported; a new resource replaces
+    the view.
+
+The example doubles as a manual cross-origin check, and LogiOps AI's Playwright
+suite runs the same two files across two real origins.
+
+## Changes
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
 MIT.
-
-## Changes
-
-- **1.0.1** — `sandbox.html` declares `color-scheme: dark light`, so a dark view does not flash white while it loads, and its Content-Security-Policy allows `font-src data:`, so a view may inline its own font.
-- **1.0.0** — first release.
