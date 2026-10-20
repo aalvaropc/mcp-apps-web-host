@@ -6,7 +6,7 @@
   "main": "src/host.js",
   "exports": { ".": "./src/host.js" },
   "files": ["src", "sandbox", "README.md", "LICENSE"],
-  "scripts": { "test": "node --test test/" },
+  "scripts": { "test": "node --test test/host.test.mjs" },
   "keywords": ["mcp", "mcp-apps", "model-context-protocol", "sandbox", "iframe", "postmessage"],
   "license": "MIT",
   "engines": { "node": ">=22" }
