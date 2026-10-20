@@ -131,3 +131,8 @@ runs in LogiOps AI's Playwright suite.
 ## License
 
 MIT.
+
+## Changes
+
+- **1.0.1** — `sandbox.html` declares `color-scheme: dark light`, so a dark view does not flash white while it loads, and its Content-Security-Policy allows `font-src data:`, so a view may inline its own font.
+- **1.0.0** — first release.
