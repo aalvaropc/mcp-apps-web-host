@@ -1,0 +1,13 @@
+{
+  "name": "mcp-apps-web-host",
+  "version": "1.0.0",
+  "description": "A dependency-free MCP Apps host bridge for web pages: sandbox proxy on a second origin, strict origin checks, host context, teardown.",
+  "type": "module",
+  "main": "src/host.js",
+  "exports": { ".": "./src/host.js" },
+  "files": ["src", "sandbox", "README.md", "LICENSE"],
+  "scripts": { "test": "node --test test/" },
+  "keywords": ["mcp", "mcp-apps", "model-context-protocol", "sandbox", "iframe", "postmessage"],
+  "license": "MIT",
+  "engines": { "node": ">=22" }
+}
