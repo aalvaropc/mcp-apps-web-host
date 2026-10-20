@@ -1,13 +1,24 @@
 {
   "name": "mcp-apps-web-host",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A dependency-free MCP Apps host bridge for web pages: sandbox proxy on a second origin, strict origin checks, host context, teardown.",
   "type": "module",
   "main": "src/host.js",
-  "exports": { ".": "./src/host.js" },
-  "files": ["src", "sandbox", "README.md", "LICENSE"],
-  "scripts": { "test": "node --test test/host.test.mjs" },
+  "exports": {
+    ".": "./src/host.js",
+    "./sandbox.html": "./sandbox/sandbox.html",
+    "./package.json": "./package.json"
+  },
+  "files": ["src", "sandbox", "README.md", "LICENSE", "CHANGELOG.md"],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "example": "node example/server.mjs"
+  },
   "keywords": ["mcp", "mcp-apps", "model-context-protocol", "sandbox", "iframe", "postmessage"],
+  "author": "Alvaro Peña (https://github.com/aalvaropc)",
   "license": "MIT",
-  "engines": { "node": ">=22" }
+  "repository": { "type": "git", "url": "git+https://github.com/aalvaropc/mcp-apps-web-host.git" },
+  "homepage": "https://github.com/aalvaropc/mcp-apps-web-host#readme",
+  "bugs": { "url": "https://github.com/aalvaropc/mcp-apps-web-host/issues" },
+  "engines": { "node": ">=18" }
 }

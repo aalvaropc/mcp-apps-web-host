@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="sandbox-origin" content="__SANDBOX_ORIGIN__">
+<meta name="color-scheme" content="light dark">
+<title>mcp-apps-web-host example</title>
+<style>
+  :root { font: 16px/1.5 system-ui, sans-serif; }
+  body { max-width: 720px; margin: 32px auto; padding: 0 16px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  button { min-height: 40px; padding: 0 16px; font: inherit; }
+  #slot iframe { display: block; width: 100%; border: 1px solid #8888; border-radius: 8px; }
+  #log { padding-left: 20px; font-family: ui-monospace, monospace; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>mcp-apps-web-host example</h1>
+<p>This page calls a tool, then shows the tool's MCP App view through the sandbox proxy on a second origin.
+  Pick an option inside the view: the page decides whether to accept it.</p>
+<div class="controls">
+  <button id="call" type="button">Call compare_options</button>
+  <button id="theme" type="button">Switch to dark</button>
+  <button id="hide" type="button">Hide the view</button>
+</div>
+<div id="slot"></div>
+<h2>What the page saw</h2>
+<ol id="log"></ol>
+<script type="module" src="/page.js"></script>
+</body>
+</html>

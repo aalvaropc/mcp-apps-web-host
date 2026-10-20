@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { color-scheme: light; font: 15px/1.4 system-ui, sans-serif; --ground: #ffffff; --ink: #1b1f24; --line: #c9d1d9; --accent: #0b4f9c; }
+  :root[data-theme="dark"] { color-scheme: dark; --ground: #14171b; --ink: #e8ecf0; --line: #3a424b; --accent: #7fb6ff; }
+  html, body { margin: 0; background: var(--ground); color: var(--ink); }
+  body { padding: 16px; }
+  ul { display: grid; gap: 8px; margin: 12px 0; padding: 0; list-style: none; }
+  button { width: 100%; min-height: 44px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  #status { min-height: 1.4em; margin: 0; color: var(--accent); }
+</style>
+</head>
+<body>
+<strong id="title">Waiting for the host…</strong>
+<ul id="options"></ul>
+<p id="status" role="status"></p>
+<script>
+  "use strict";
+  let nextId = 1;
+  const pending = new Map();
+
+  function request(method, params) {
+    const id = nextId++;
+    window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, "*");
+    return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
+  }
+
+  function notify(method, params) {
+    window.parent.postMessage({ jsonrpc: "2.0", method, params }, "*");
+  }
+
+  function applyContext(context) {
+    if (context && context.theme) document.documentElement.dataset.theme = context.theme;
+  }
+
+  function resize() {
+    notify("ui/notifications/size-changed", { height: Math.ceil(document.documentElement.getBoundingClientRect().height) });
+  }
+
+  function render(result) {
+    const data = (result && result.structuredContent) || {};
+    document.getElementById("title").textContent = `Delivery options for ${data.order_id}`;
+    const list = document.getElementById("options");
+    list.replaceChildren();
+    for (const option of data.options || []) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${option.label}: $${option.cost}, ${option.days} day${option.days === 1 ? "" : "s"}`;
+      button.addEventListener("click", async () => {
+        const status = document.getElementById("status");
+        try {
+          await request("ui/message", { role: "user", content: { type: "text", text: `Pick ${option.id}` } });
+          status.textContent = `The host accepted ${option.label}.`;
+        } catch (error) {
+          status.textContent = `The host refused: ${error.message}`;
+        }
+        resize();
+      });
+      const item = document.createElement("li");
+      item.append(button);
+      list.append(item);
+    }
+    resize();
+  }
+
+  window.addEventListener("message", (event) => {
+    const message = event.data;
+    if (!message || message.jsonrpc !== "2.0") return;
+    if (!message.method && pending.has(message.id)) {
+      const { resolve, reject } = pending.get(message.id);
+      pending.delete(message.id);
+      if (message.error) reject(message.error);
+      else resolve(message.result);
+    } else if (message.method === "ui/notifications/tool-result") {
+      render(message.params);
+    } else if (message.method === "ui/notifications/host-context-changed") {
+      applyContext(message.params);
+    } else if (message.method === "ui/resource-teardown") {
+      window.parent.postMessage({ jsonrpc: "2.0", id: message.id, result: {} }, "*");
+    }
+  });
+
+  request("ui/initialize", {
+    protocolVersion: "2026-01-26",
+    clientInfo: { name: "Delivery options view", version: "1.0.0" },
+    appCapabilities: { availableDisplayModes: ["inline"] },
+  }).then((result) => {
+    applyContext(result.hostContext);
+    notify("ui/notifications/initialized", {});
+  });
+</script>
+</body>
+</html>
