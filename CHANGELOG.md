@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+- `onReady(resource)` fires once after initialization and tool delivery. `onError(error)` reports iframe load errors and initialization timeouts (`readyTimeout`, default 5000 ms).
+- Pending readiness timers are cancelled when a view is hidden, replaced, or destroyed. `show()` still resolves after the iframe is mounted.
+- Tool discovery follows `nextCursor`, rejects cursor cycles, and retries missing or invalid resources on subsequent calls.
+
 ## 1.2.0
 
 - TypeScript declarations ship in the package (`types/host.d.ts`): the options, the host object, the view resource and the two constants. `test/types.check.ts` keeps them honest in CI.

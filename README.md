@@ -48,9 +48,17 @@ shows it only if its MIME type is `text/html;profile=mcp-app`. It returns the
 resource, or `null` when nothing was shown: a show that a newer one supersedes,
 or whose optional `stillWanted()` turns false, shows nothing. Other options:
 `onHide`, `rejectMessage`, `frameTitle`, `frameId`, `proxyPath`, `minHeight`,
-`maxHeight`, `teardownTimeout`, `mime`, `protocol` and `window`. The host also
+`maxHeight`, `teardownTimeout`, `readyTimeout`, `onReady`, `onError`, `mime`, `protocol` and `window`. The host also
 has `loadResource(toolName)` to prefetch, `isShowing()`, `ready()` and
 `destroy()`.
+
+`show()` resolves when the iframe is mounted. Keep a fallback visible until
+`onReady(resource)` fires, after the view initializes and receives its tool data.
+`onError(error)` reports iframe load failures or initialization exceeding
+`readyTimeout` (5000 ms by default), and the failed iframe is removed. Hiding,
+replacing, or destroying a view cancels its pending readiness timer.
+Tool discovery follows every `nextCursor`; missing or invalid resources are
+retried on the next request, while successful reads stay cached.
 
 ## Serve the sandbox page
 

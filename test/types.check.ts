@@ -11,6 +11,9 @@ const host: McpAppHost = createMcpAppHost({
   hostContext: () => ({ theme: "dark", displayMode: "inline" }),
   onMessage: async (params) => typeof params === "object",
   onHide: (reason) => reason.length,
+  onReady: (resource) => resource.uri.length,
+  onError: (error) => error.message.length,
+  readyTimeout: 5000,
   maxHeight: 640,
 });
 
