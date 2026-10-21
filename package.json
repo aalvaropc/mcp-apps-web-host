@@ -1,7 +1,7 @@
 {
   "name": "mcp-apps-web-host",
   "version": "1.1.0",
-  "description": "A dependency-free MCP Apps host bridge for web pages: sandbox proxy on a second origin, strict origin checks, host context, teardown.",
+  "description": "Dependency-free MCP Apps host for web pages, with a sandbox proxy on a second origin.",
   "type": "module",
   "main": "src/host.js",
   "exports": {
