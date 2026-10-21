@@ -18,7 +18,7 @@ where the same two files render a plan-comparison card.
 npm install mcp-apps-web-host
 ```
 
-Serve the sandbox page (`mcp-apps-web-host/sandbox.html`, in the package at
+TypeScript declarations ship with the package. Serve the sandbox page (`mcp-apps-web-host/sandbox.html`, in the package at
 `sandbox/sandbox.html`) as a static file from the sandbox origin. Without npm,
 copy `src/host.js` and `sandbox/sandbox.html`.
 
@@ -124,4 +124,4 @@ suite runs the same two files across two real origins.
 
 ## License
 
-MIT. Changes are in [CHANGELOG.md](CHANGELOG.md).
+MIT. Changes are in [CHANGELOG.md](CHANGELOG.md); how to contribute, in [CONTRIBUTING.md](CONTRIBUTING.md).

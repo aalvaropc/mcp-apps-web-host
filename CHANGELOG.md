@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- TypeScript declarations ship in the package (`types/host.d.ts`): the options, the host object, the view resource and the two constants. `test/types.check.ts` keeps them honest in CI.
+- `CONTRIBUTING.md`: how to run the tests and the example, what a pull request needs, and how to report a problem.
+- The code is the same as 1.1.0.
+
 ## 1.1.1
 
 - Documentation only: a shorter README and a one-line package description. The code is the same as 1.1.0.

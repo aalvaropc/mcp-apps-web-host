@@ -1,17 +1,19 @@
 {
   "name": "mcp-apps-web-host",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Dependency-free MCP Apps host for web pages, with a sandbox proxy on a second origin.",
   "type": "module",
   "main": "src/host.js",
+  "types": "types/host.d.ts",
   "exports": {
-    ".": "./src/host.js",
+    ".": { "types": "./types/host.d.ts", "default": "./src/host.js" },
     "./sandbox.html": "./sandbox/sandbox.html",
     "./package.json": "./package.json"
   },
-  "files": ["src", "sandbox", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": ["src", "sandbox", "types", "README.md", "LICENSE", "CHANGELOG.md", "CONTRIBUTING.md"],
   "scripts": {
     "test": "node --test test/*.test.mjs",
+    "check-types": "npx -y -p typescript@5 tsc --noEmit --strict --module esnext --moduleResolution bundler --target es2022 test/types.check.ts",
     "example": "node example/server.mjs"
   },
   "keywords": ["mcp", "mcp-apps", "model-context-protocol", "sandbox", "iframe", "postmessage"],
