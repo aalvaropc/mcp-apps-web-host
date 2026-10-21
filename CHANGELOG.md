@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Documentation only: a shorter README and a one-line package description. The code is the same as 1.1.0.
+
 ## 1.1.0
 
 - `onMessage` may return a promise. The view gets its answer once the promise settles; a handler that throws or rejects is a refusal (`-32000`), and an answer for a view that was replaced or hidden in the meantime is dropped.

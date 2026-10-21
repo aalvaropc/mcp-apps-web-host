@@ -1,6 +1,6 @@
 {
   "name": "mcp-apps-web-host",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Dependency-free MCP Apps host for web pages, with a sandbox proxy on a second origin.",
   "type": "module",
   "main": "src/host.js",
