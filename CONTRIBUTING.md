@@ -1,5 +1,10 @@
 # Contributing
 
+Run `npm ci` before the checks to use the committed development lockfile.
+`npm run test:package` installs the tarball in a temporary consumer and checks
+its exports and types. `npm run test:browser` exercises the example with two
+origins in Chromium; install it with `npx --no-install playwright install chromium`.
+
 Thanks for looking. This is a small library with no dependencies and no build step, so the loop is short.
 
 ## Run it
