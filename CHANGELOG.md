@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- The sandbox proxy works in Firefox. A browser may report the host's origin in `location.ancestorOrigins` as `"null"` when the host's iframe sends no referrer (Firefox does, as the specification says, and this library's host sets `referrerpolicy="no-referrer"`). The proxy treated that as a foreign host and stayed silent, so no view ever loaded in Firefox. A masked entry is now treated like a missing one; the origin checks on every message and the `frame-ancestors` policy still decide who can talk to the proxy. The browser test runs in Chromium and Firefox.
+
 ## 1.3.0
 
 - `onReady(resource)` fires once after initialization and tool delivery. `onError(error)` reports iframe load errors and initialization timeouts. `readyTimeout` is disabled by default (`0`); a positive value enables it, its budget restarts once when the sandbox page fires `load`, and `Infinity` also disables it.
