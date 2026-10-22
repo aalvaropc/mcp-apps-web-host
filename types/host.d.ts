@@ -45,11 +45,14 @@ export interface McpAppHostOptions {
   /** Handles `ui/message`; a truthy result (or resolved value) accepts it, anything else refuses it. */
   onMessage?: (params: any) => unknown | Promise<unknown>;
   onHide?: (reason: string) => void;
+  onReady?: (resource: McpAppResource) => void;
+  onError?: (error: Error) => void;
   frameTitle?: string;
   frameId?: string;
   minHeight?: number;
   maxHeight?: number;
   teardownTimeout?: number;
+  readyTimeout?: number;
   rejectMessage?: string;
 }
 
