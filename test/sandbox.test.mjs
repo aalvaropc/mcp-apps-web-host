@@ -54,7 +54,7 @@ test("the proxy stays silent unless it is framed by the host it was given", () =
     const sandbox = proxy(options);
     assert.deepEqual([sandbox.toHost, sandbox.listeners.length], [[], 0], JSON.stringify(options));
   }
-  for (const ancestors of [[HOST], null]) {
+  for (const ancestors of [[HOST], null, ["null"]]) {
     assert.deepEqual(proxy({ ancestors }).toHost, [{ message: { jsonrpc: "2.0", method: "ui/notifications/sandbox-proxy-ready", params: {} }, target: HOST }]);
   }
 });

@@ -103,7 +103,8 @@ iframe under a CSP, and messages cross both boundaries as JSON-RPC over
 - **Origins.** The host accepts a message only from the proxy frame's window
   **and** the sandbox origin, and names that origin on everything it posts. The
   proxy runs only when it is framed and `?host=` names another origin (checked
-  against `ancestorOrigins` where the browser has it), and forwards only between
+  against `ancestorOrigins` where the browser reports it; Firefox masks it as
+  `"null"` behind a no-referrer frame), and forwards only between
   that host and the current view.
 - **No spoofing.** Proxy-level messages (`ui/notifications/sandbox-*`) never cross
   the proxy in either direction.
