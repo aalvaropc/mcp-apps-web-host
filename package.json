@@ -13,8 +13,10 @@
   "files": ["src", "sandbox", "types", "README.md", "LICENSE", "CHANGELOG.md", "CONTRIBUTING.md"],
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check-types": "npx -y -p typescript@5 tsc --noEmit --strict --module esnext --moduleResolution bundler --target es2022 test/types.check.ts",
-    "example": "node example/server.mjs"
+    "check-types": "tsc --noEmit --strict --module esnext --moduleResolution bundler --target es2022 test/types.check.ts",
+    "example": "node example/server.mjs",
+    "test:browser": "playwright test",
+    "test:package": "node test/consumer.mjs"
   },
   "keywords": ["mcp", "mcp-apps", "model-context-protocol", "sandbox", "iframe", "postmessage"],
   "author": "Alvaro Peña (https://github.com/aalvaropc)",
@@ -22,5 +24,6 @@
   "repository": { "type": "git", "url": "git+https://github.com/aalvaropc/mcp-apps-web-host.git" },
   "homepage": "https://github.com/aalvaropc/mcp-apps-web-host#readme",
   "bugs": { "url": "https://github.com/aalvaropc/mcp-apps-web-host/issues" },
-  "engines": { "node": ">=18" }
+  "engines": { "node": ">=18" },
+  "devDependencies": { "@playwright/test": "1.62.0", "typescript": "5.9.3" }
 }
