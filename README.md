@@ -55,8 +55,9 @@ or whose optional `stillWanted()` turns false, shows nothing. Other options:
 `show()` resolves when the iframe is mounted. Keep a fallback visible until
 `onReady(resource)` fires, after the view initializes and receives its tool data.
 `onError(error)` reports iframe load failures or initialization exceeding
-`readyTimeout` (5000 ms by default, restarted when the sandbox page fires
-`load`; `0` or `Infinity` turns the limit off), and the failed iframe is removed.
+`readyTimeout`, and the failed iframe is removed. The limit is disabled by
+default (`0`); set a positive number of milliseconds to enable it. The budget
+restarts once when the sandbox page fires `load`. `Infinity` also disables it.
 A browser fires `load` for an error page too, so the timeout is what catches a
 sandbox that answers with an HTTP error. Hiding, replacing, or destroying a view
 cancels its pending readiness timer; `onHide` runs for a failed view as well.

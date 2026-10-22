@@ -45,16 +45,13 @@ export interface McpAppHostOptions {
   /** Handles `ui/message`; a truthy result (or resolved value) accepts it, anything else refuses it. */
   onMessage?: (params: any) => unknown | Promise<unknown>;
   onHide?: (reason: string) => void;
-  /** Called once, after the view initialized and received its tool input and result. */
   onReady?: (resource: McpAppResource) => void;
-  /** Called when a mounted view fails to initialize in time; the failed frame is already removed. */
   onError?: (error: Error) => void;
   frameTitle?: string;
   frameId?: string;
   minHeight?: number;
   maxHeight?: number;
   teardownTimeout?: number;
-  /** Milliseconds a mounted view has to initialize, counted again from the sandbox page's `load`; default 5000, `0` or `Infinity` disables the limit. */
   readyTimeout?: number;
   rejectMessage?: string;
 }

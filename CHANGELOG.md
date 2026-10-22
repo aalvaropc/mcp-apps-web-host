@@ -2,7 +2,7 @@
 
 ## 1.3.0
 
-- `onReady(resource)` fires once after initialization and tool delivery. `onError(error)` reports iframe load errors and initialization timeouts (`readyTimeout`, default 5000 ms; the budget restarts when the sandbox page fires `load`, and `0` or `Infinity` turns the limit off).
+- `onReady(resource)` fires once after initialization and tool delivery. `onError(error)` reports iframe load errors and initialization timeouts. `readyTimeout` is disabled by default (`0`); a positive value enables it, its budget restarts once when the sandbox page fires `load`, and `Infinity` also disables it.
 - Pending readiness timers are cancelled when a view is hidden, replaced, or destroyed. A view that fails to initialize no longer cancels a newer `show()` that is still loading. `show()` still resolves after the iframe is mounted.
 - Tool discovery follows `nextCursor` (a `null` or empty cursor ends the listing), rejects cursor cycles, and retries missing tools and unreadable resources on subsequent calls. A tool that declares no view stays cached.
 
