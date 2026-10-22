@@ -48,9 +48,22 @@ shows it only if its MIME type is `text/html;profile=mcp-app`. It returns the
 resource, or `null` when nothing was shown: a show that a newer one supersedes,
 or whose optional `stillWanted()` turns false, shows nothing. Other options:
 `onHide`, `rejectMessage`, `frameTitle`, `frameId`, `proxyPath`, `minHeight`,
-`maxHeight`, `teardownTimeout`, `mime`, `protocol` and `window`. The host also
-has `loadResource(toolName)` to prefetch, `isShowing()`, `ready()` and
-`destroy()`.
+`maxHeight`, `teardownTimeout`, `readyTimeout`, `onReady`, `onError`, `mime`,
+`protocol` and `window`. The host also has `loadResource(toolName)` to prefetch,
+`isShowing()`, `ready()` and `destroy()`.
+
+`show()` resolves when the iframe is mounted. Keep a fallback visible until
+`onReady(resource)` fires, after the view initializes and receives its tool data.
+`onError(error)` reports iframe load failures or initialization exceeding
+`readyTimeout`, and the failed iframe is removed. The limit is disabled by
+default (`0`); set a positive number of milliseconds to enable it. The budget
+restarts once when the sandbox page fires `load`. `Infinity` also disables it.
+A browser fires `load` for an error page too, so the timeout is what catches a
+sandbox that answers with an HTTP error. Hiding, replacing, or destroying a view
+cancels its pending readiness timer; `onHide` runs for a failed view as well.
+Tool discovery follows every `nextCursor`, and a `null` or empty one ends the
+listing. A missing tool or an unreadable resource is retried on the next request,
+a tool that declares no view is cached, and successful reads stay cached.
 
 ## Serve the sandbox page
 
